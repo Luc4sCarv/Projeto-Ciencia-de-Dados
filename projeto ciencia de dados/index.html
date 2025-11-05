@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EducaDados - Dados pela Educação</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">EducaDados</h1>
+            <nav class="nav">
+                <a href="#" class="nav-link">Entrar</a>
+                <button class="btn-primary" id="btnCadastrar">Cadastre-se</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h2>Dados pela Educação</h2>
+                <p>Nossa missão é usar dados para combater a desigualdade educacional no Brasil, facilitando informações do IDEB para ajudar gestores públicos, professores e estudantes a monitorar o progresso e potencializar a aprendizagem dos estudantes.</p>
+                <button class="btn-secondary">Saiba mais</button>
+            </div>
+            <div class="hero-image">
+    <svg viewBox="0 0 400 300" class="illustration">
+        
+        <ellipse cx="250" cy="150" rx="150" ry="130" fill="#00A651"/>
+        
+        <image href="estudandes.png" x="40" y="10" width="300" height="290"  />
+
+    </svg>
+</div>
+        </div>
+    </section>
+
+    <!-- Sample Data Section -->
+    <section class="sample-data">
+        <div class="container">
+            <h3>Alguns dados de exemplo</h3>
+            <div class="data-grid">
+                <div class="data-card small"></div>
+                <div class="data-card medium"></div>
+                <div class="data-card small"></div>
+                <div class="data-card medium"></div>
+                <div class="data-card large">
+                    
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.10178617755!2d-46.65800478554239!3d-23.56409116754025!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa315%3A0xe5da9b5de9b3506!2sMuseu%20de%20Arte%20de%20S%C3%A3o%20Paulo%20Assis%20Chateaubriand!5e0!3m2!1spt-BR!2sbr!4v1671040330123!5m2!1spt-BR!2sbr" 
+                        width="1400" 
+                        height="470" 
+                        style="border:0;" 
+                        allowfullscreen="true" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Target Audience Section -->
+    <section class="audience">
+        <div class="container">
+            <h3>Para Quem é?</h3>
+            
+            <div class="audience-card">
+                <div class="audience-content">
+                    <h4>Para Gestores Públicos</h4>
+                    <p>Sabemos que seu documento é limitado e preciso fazer cada ação contar. Trazemos informações centralizadas sobre desempenho e infraestrutura. Compare escolas, identifique padrões de sucesso e priorize investimentos e melhorar o IDEB da sua rede de ensino.</p>
+                </div>
+                <div class="audience-icon">🧙‍♂️</div>
+            </div>
+
+            <div class="audience-card">
+                <div class="audience-icon">🫃</div>
+                <div class="audience-content">
+                    <h4>Para professores</h4>
+                    <p>Lidar com turmas superlotadas e materiais técnicos desatualizados é um desafio diário. Em nossa plataforma, você terá acesso a recursos pedagógicos modernos, oportunidades de formação continuada e dados sobre o desempenho dos seus alunos, ajudando a promover o interesse pela leitura e melhorar as taxas de aprovação.</p>
+                </div>
+            </div>
+
+            <div class="audience-card">
+                <div class="audience-content">
+                    <h4>Para alunos</h4>
+                    <p>Sonha em cursar uma universidade federal, mas sente o desamparo de não compreender com clareza as escolas? Aqui você encontrará símbolos, estatísticas de aprovação e programas, superando as barreiras de uma educação escolar deficiente e se preparando para o futuro.</p>
+                </div>
+                <div class="audience-icon">🥷</div>
+            </div>
+
+            <div class="student-photo">
+                <img src="2K.png">
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <p class="cta-text">Acreditamos que as decisões sobre educação devem ser baseadas em dados, eficazes e justas. Comece a transformar a educação com EducaDados hoje!</p>
+            <button class="btn-primary large" id="btnJunte">Junte-se a nós</button>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="loginModal">&times;</span>
+            <h2>Login</h2>
+            <form class="form">
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+                <p class="form-footer">Não tem conta? <a href="#" id="linkCadastro">Cadastre-se</a></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-modal="registerModal">&times;</span>
+            <h2>Crie sua conta</h2>
+            <form class="form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Crie uma senha</label>
+                    <input type="password" required>
+                </div>
+                <div class="form-group">
+                    <label>Qual seu perfil?</label>
+                    <select required>
+                        <option value="">Selecione...</option>
+                        <option value="gestor">Gestor Público</option>
+                        <option value="professor">Professor</option>
+                        <option value="aluno">Aluno</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Data de nascimento</label>
+                    <input type="date" required>
+                </div>
+                <div class="form-group">
+                    <label>Onde você deseja acessar?</label>
+                    <input type="text" placeholder="Cidade/Estado" required>
+                </div>
+                <button type="submit" class="btn-primary">Continuar</button>
+                <p class="form-footer">Já tem conta? <a href="#" id="linkLogin">Entrar</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="scripts/main.js"></script>
+</body>
+</html>
