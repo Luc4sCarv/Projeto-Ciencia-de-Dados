@@ -53,3 +53,49 @@ function logout() {
     window.location.href = 'index.html';
   }
 }
+
+// Aguarda o HTML ser totalmente carregado
+document.addEventListener('DOMContentLoaded', () => {
+    carregarDadosDoDashboard();
+});
+
+// Função para buscar os dados do nosso ARQUIVO JSON
+async function carregarDadosDoDashboard() {
+    try {
+        // Faz a requisição para o arquivo JSON local
+        // O caminho é relativo ao HTML (dashboard.html)
+        const response = await fetch('data/dashboard_stats.json'); 
+        
+        if (!response.ok) {
+            throw new Error('Falha ao carregar arquivo de dados. Verifique o caminho.');
+        }
+        
+        const dados = await response.json();
+
+        // Atualiza o HTML com os dados recebidos
+        atualizarValoresNoHTML(dados);
+
+    } catch (error) {
+        console.error('Erro:', error);
+        // Se falhar, os dados estáticos do HTML permanecerão visíveis
+    }
+}
+
+// Função para atualizar o HTML (esta não muda)
+function atualizarValoresNoHTML(dados) {
+    const elTotalEscolas = document.getElementById('total-escolas');
+    const elIdebMedio = document.getElementById('ideb-medio');
+    const elTaxaAprovacao = document.getElementById('taxa-aprovacao');
+    const elAlunosMatriculados = document.getElementById('alunos-matriculados');
+
+    if (elTotalEscolas) elTotalEscolas.textContent = dados.totalEscolas;
+    if (elIdebMedio) elIdebMedio.textContent = dados.idebMedio;
+    if (elTaxaAprovacao) elTaxaAprovacao.textContent = dados.taxaAprovacao;
+    if (elAlunosMatriculados) elAlunosMatriculados.textContent = dados.alunosMatriculados;
+}
+
+// Função de logout (você já tinha no HTML)
+function logout() {
+    console.log("Usuário deslogado.");
+    window.location.href = 'index.html';
+}

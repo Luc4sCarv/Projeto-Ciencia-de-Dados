@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EducaDados - Dashboard do Usuário</title>
+    <link rel="stylesheet" href="styles/dashboard.css">
+</head>
+<body>
+        <header class="header">
+        <h1 class="logo">EducaDados</h1>
+        <div class="header-right">
+            <span class="status-badge">Bem-vindo(a) (User)</span>
+                        <button class="btn-logout" onclick="logout()">Sair</button>
+            <div class="user-icon">👤</div>
+        </div>
+    </header>
+
+        <div class="dashboard">
+                <aside class="sidebar">
+            <div class="filter-group">
+                <h3>Filtros:</h3>
+                <input type="text" class="filter-input" placeholder="Pesquisar...">
+            </div>
+
+            <div class="filter-group">
+                <h3>Categorias</h3>
+                <div style="padding: 0 1.5rem;">
+                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
+                        <input type="checkbox" style="margin-right: 0.5rem;">
+                        Desempenho
+                    </label>
+                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
+                        <input type="checkbox" style="margin-right: 0.5rem;">
+                        Infraestrutura
+                    </label>
+                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
+                        <input type="checkbox" style="margin-right: 0.5rem;">
+                        Aprovação
+                    </label>
+                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
+                        <input type="checkbox" style="margin-right: 0.5rem;">
+                        IDEB
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+                <main class="main-content">
+                        <section class="section">
+                <h2 class="section-title">Essenciais</h2>
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <h4>Total de Escolas</h4>
+                        <div class="value" id="total-escolas">1.247</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>IDEB Médio</h4>
+                        <div class="value" id="ideb-medio">5.8</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Taxa de Aprovação</h4>
+                        <div class="value" id="taxa-aprovacao">87%</div>
+                    </div>
+                    <div class="info-card">
+                        <h4>Alunos Matriculados</h4>
+                        <div class="value" id="alunos-matriculados">45.2K</div>
+                    </div>
+                </div>
+            </section>
+
+                        <section class="section">
+                <h2 class="section-title">Central de serviços</h2>
+                <div class="control-panel">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 400'%3E%3Cdefs%3E%3CradialGradient id='earthGrad' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%231a237e;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23000;stop-opacity:1' /%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='800' height='400' fill='url(%23earthGrad)'/%3E%3Ccircle cx='400' cy='200' r='120' fill='%23004d40' opacity='0.8'/%3E%3Ccircle cx='420' cy='180' r='30' fill='%2300695c' opacity='0.6'/%3E%3Ccircle cx='370' cy='210' r='40' fill='%2300796b' opacity='0.7'/%3E%3Ccircle cx='430' cy='220' r='25' fill='%2300695c' opacity='0.5'/%3E%3Cg opacity='0.3'%3E%3Ccircle cx='150' cy='80' r='2' fill='white'/%3E%3Ccircle cx='250' cy='120' r='1.5' fill='white'/%3E%3Ccircle cx='600' cy='90' r='2' fill='white'/%3E%3Ccircle cx='700' cy='150' r='1' fill='white'/%3E%3Ccircle cx='550' cy='300' r='1.5' fill='white'/%3E%3Ccircle cx='200' cy='280' r='1' fill='white'/%3E%3C/g%3E%3C/svg%3E" 
+                         alt="Visualização da Terra" 
+                         class="earth-view">
+                    <div class="control-overlay">
+                        <button class="control-btn">🌍 Mapa</button>
+                        <button class="control-btn">📊 Dados</button>
+                        <button class="control-btn">🔍 Zoom</button>
+                    </div>
+                </div>
+            </section>
+
+                        <section class="section">
+                <h2 class="section-title">Ferramentas</h2>
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-icon">📈</div>
+                        <h4>Análise de Desempenho</h4>
+                        <p>Compare o desempenho das escolas da sua região e identifique oportunidades de melhoria.</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">🏫</div>
+                        <h4>Gestão Escolar</h4>
+                        <p>Acesse dados completos sobre infraestrutura, recursos e necessidades das escolas.</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">📚</div>
+                        <h4>Recursos Pedagógicos</h4>
+                        <p>Encontre materiais didáticos, planos de aula e recursos para professores.</p>
+                    </div>
+                    <div class="tool-card">
+content-length: 106
+                        <div class="tool-icon">👥</div>
+                        <h4>Capacitação</h4>
+                        <p>Cursos e programas de formação continuada para educadores.</p>
+                    </div>
+                    <div class="tool-card">
+                        <div class="tool-icon">💡</div>
+                        <h4>Boas Práticas</h4>
+                        <p>Compartilhe e aprenda com experiências de sucesso de outras escolas.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+        <div class="decorative-shapes">
+        <div class="shape circle"></div>
+        <div class="shape triangle"></div>
+        <div class="shape star"></div>
+        <div class="shape blob"></div>
+    </div>
+
+    <script src="scripts/dashboard.js"></script>
+</body>
+</html>
