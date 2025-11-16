@@ -1,19 +1,19 @@
 """
-Script para inspecionar os CSVs e descobrir suas colunas
+Script para inspecionar os CSVs do ENEM e descobrir suas colunas
 Execute: python inspect_csv.py
 """
 
 import pandas as pd
 import os
 
-def inspect_csv(filename):
-    """Inspeciona um arquivo CSV e mostra informações úteis"""
+def inspect_csv(filename, year):
+    """Inspeciona um arquivo CSV do ENEM e mostra informações úteis"""
     if not os.path.exists(filename):
         print(f"❌ Arquivo não encontrado: {filename}\n")
         return
     
     print(f"\n{'='*80}")
-    print(f"📁 Arquivo: {filename}")
+    print(f"📁 Arquivo: {filename} (ENEM {year})")
     print(f"{'='*80}")
     
     try:
@@ -23,7 +23,8 @@ def inspect_csv(filename):
         
         for encoding in encodings:
             try:
-                df = pd.read_csv(filename, encoding=encoding, nrows=1000, low_memory=False)
+                # Carrega apenas 5000 linhas para análise rápida
+                df = pd.read_csv(filename, encoding=encoding, nrows=5000, low_memory=False)
                 print(f"✓ Encoding detectado: {encoding}")
                 break
             except:
@@ -35,87 +36,159 @@ def inspect_csv(filename):
         
         # Informações básicas
         print(f"\n📊 Informações Gerais:")
-        print(f"   • Total de linhas (primeiras 1000): {len(df)}")
+        print(f"   • Linhas analisadas: {len(df)} (amostra)")
         print(f"   • Total de colunas: {len(df.columns)}")
         print(f"   • Tamanho do arquivo: {os.path.getsize(filename) / (1024*1024):.2f} MB")
         
-        # Lista todas as colunas
-        print(f"\n📋 Colunas Disponíveis ({len(df.columns)}):")
-        for i, col in enumerate(df.columns, 1):
-            dtype = df[col].dtype
-            non_null = df[col].notna().sum()
-            print(f"   {i:3d}. {col:50s} | Tipo: {dtype:10s} | Não-nulos: {non_null}")
+        # Colunas importantes para o ENEM
+        print(f"\n🎯 Colunas Relevantes Identificadas:")
         
-        # Colunas numéricas
-        numeric_cols = df.select_dtypes(include=['number']).columns.tolist()
-        print(f"\n🔢 Colunas Numéricas ({len(numeric_cols)}):")
-        for col in numeric_cols[:20]:  # Primeiras 20
-            print(f"   • {col}")
-        if len(numeric_cols) > 20:
-            print(f"   ... e mais {len(numeric_cols) - 20} colunas")
-        
-        # Colunas de texto
-        text_cols = df.select_dtypes(include=['object']).columns.tolist()
-        print(f"\n📝 Colunas de Texto ({len(text_cols)}):")
-        for col in text_cols[:20]:  # Primeiras 20
-            unique_count = df[col].nunique()
-            print(f"   • {col:50s} | Valores únicos: {unique_count}")
-        if len(text_cols) > 20:
-            print(f"   ... e mais {len(text_cols) - 20} colunas")
-        
-        # Colunas que podem ser interessantes para análise
-        print(f"\n🎯 Colunas Potencialmente Úteis:")
-        interesting_keywords = ['uf', 'estado', 'municipio', 'nome', 'nota', 'media', 
-                               'total', 'quantidade', 'taxa', 'indice', 'ideb', 'codigo']
+        colunas_importantes = {
+            '📍 Geográficas': [],
+            '📝 Notas': [],
+            '✅ Presença': [],
+            '🏫 Escola': [],
+            '📊 Demográficas': [],
+            '🌐 Outros': []
+        }
         
         for col in df.columns:
-            col_lower = col.lower()
-            if any(keyword in col_lower for keyword in interesting_keywords):
-                print(f"   • {col}")
+            col_upper = col.upper()
+            
+            if any(x in col_upper for x in ['UF', 'MUNICIPIO', 'RESIDENCIA']):
+                colunas_importantes['📍 Geográficas'].append(col)
+            elif 'NOTA' in col_upper:
+                colunas_importantes['📝 Notas'].append(col)
+            elif 'PRESENCA' in col_upper:
+                colunas_importantes['✅ Presença'].append(col)
+            elif any(x in col_upper for x in ['ESCOLA', 'TP_ESCOLA']):
+                colunas_importantes['🏫 Escola'].append(col)
+            elif any(x in col_upper for x in ['SEXO', 'IDADE', 'RACA', 'RENDA', 'Q0']):
+                colunas_importantes['📊 Demográficas'].append(col)
+            elif any(x in col_upper for x in ['LINGUA', 'TREINEIRO', 'STATUS']):
+                colunas_importantes['🌐 Outros'].append(col)
+        
+        for categoria, colunas in colunas_importantes.items():
+            if colunas:
+                print(f"\n{categoria}:")
+                for col in colunas[:15]:  # Mostra até 15 colunas por categoria
+                    print(f"   • {col}")
+                if len(colunas) > 15:
+                    print(f"   ... e mais {len(colunas) - 15} colunas")
+        
+        # Estatísticas das notas
+        nota_cols = [col for col in df.columns if 'NOTA' in col.upper()]
+        if nota_cols:
+            print(f"\n📈 Estatísticas das Notas (amostra de {len(df)} registros):")
+            stats = df[nota_cols].describe()
+            print(stats.to_string())
+        
+        # Distribuição por UF
+        uf_cols = [col for col in df.columns if 'SG_UF' in col.upper()]
+        if uf_cols:
+            print(f"\n🗺️ Distribuição por Estado (Top 10):")
+            uf_col = uf_cols[0]
+            uf_counts = df[uf_col].value_counts().head(10)
+            for uf, count in uf_counts.items():
+                print(f"   • {uf}: {count} inscritos")
+        
+        # Tipo de escola
+        if 'TP_ESCOLA' in df.columns:
+            print(f"\n🏫 Distribuição por Tipo de Escola:")
+            escola_counts = df['TP_ESCOLA'].value_counts()
+            tipos = {1: 'Pública', 2: 'Privada', 3: 'Não informado'}
+            for tipo, count in escola_counts.items():
+                nome = tipos.get(tipo, f'Tipo {tipo}')
+                print(f"   • {nome}: {count} inscritos ({count/len(df)*100:.1f}%)")
+        
+        # Taxa de presença
+        presenca_cols = [col for col in df.columns if 'PRESENCA' in col.upper()]
+        if presenca_cols:
+            print(f"\n✅ Taxa de Presença:")
+            for col in presenca_cols:
+                presentes = (df[col] == 1).sum()
+                taxa = (presentes / len(df)) * 100
+                area = col.replace('TP_PRESENCA_', '')
+                print(f"   • {area}: {taxa:.1f}% presentes")
         
         # Preview dos dados
         print(f"\n👀 Preview dos Dados (primeiras 3 linhas):")
-        print(df.head(3).to_string())
-        
-        # Estatísticas das colunas numéricas
-        if len(numeric_cols) > 0:
-            print(f"\n📈 Estatísticas Básicas (colunas numéricas):")
-            stats = df[numeric_cols].describe()
-            print(stats.to_string())
+        colunas_preview = [col for col in df.columns if any(x in col.upper() for x in 
+                          ['NOTA', 'UF', 'ESCOLA', 'PRESENCA'])][:10]
+        if colunas_preview:
+            print(df[colunas_preview].head(3).to_string())
         
     except Exception as e:
         print(f"❌ Erro ao processar o arquivo: {e}")
+        import traceback
+        traceback.print_exc()
 
 def main():
     """Função principal"""
     print("""
     ╔══════════════════════════════════════════════════════════════════════════╗
-    ║                    🔍 INSPETOR DE CSVs - EducaDados                      ║
+    ║                  🔍 INSPETOR DE CSVs - ENEM 2022-2024                   ║
     ║                                                                          ║
-    ║  Este script analisa seus arquivos CSV e mostra todas as colunas        ║
-    ║  disponíveis para você ajustar a API corretamente.                      ║
+    ║  Este script analisa os microdados do ENEM e mostra informações         ║
+    ║  relevantes para configurar a API e criar os dashboards.                ║
     ╚══════════════════════════════════════════════════════════════════════════╝
     """)
     
-    # Lista de arquivos para inspecionar
-    files = [
-        'microdados_ed_basica_2024.csv',
-        'RESULTADOS_2024.csv',
-        'PARTICIPANTES_2024.csv',
-        'ITENS_PROVA_2024.csv'
-    ]
+    # Anos disponíveis
+    years = [2022, 2023, 2024]
     
-    for filename in files:
-        inspect_csv(filename)
+    print("📋 Verificando arquivos disponíveis...\n")
+    
+    arquivos_encontrados = []
+    
+    for year in years:
+        microdados = f'MICRODADOS_ENEM_{year}.csv'
+        itens = f'ITENS_PROVA_{year}.csv'
+        
+        if os.path.exists(microdados):
+            arquivos_encontrados.append((microdados, year, 'microdados'))
+            print(f"✓ {microdados} encontrado")
+        else:
+            print(f"⚠ {microdados} NÃO encontrado")
+        
+        if os.path.exists(itens):
+            arquivos_encontrados.append((itens, year, 'itens'))
+            print(f"✓ {itens} encontrado")
+        else:
+            print(f"⚠ {itens} NÃO encontrado")
+    
+    if not arquivos_encontrados:
+        print("\n❌ Nenhum arquivo encontrado!")
+        print("\n💡 Certifique-se de que os arquivos estão no mesmo diretório:")
+        print("   • MICRODADOS_ENEM_2022.csv")
+        print("   • MICRODADOS_ENEM_2023.csv")
+        print("   • MICRODADOS_ENEM_2024.csv")
+        print("   • ITENS_PROVA_2022.csv")
+        print("   • ITENS_PROVA_2023.csv")
+        print("   • ITENS_PROVA_2024.csv")
+        return
+    
+    print(f"\n{'='*80}")
+    print("🔍 Iniciando análise detalhada...")
+    print(f"{'='*80}")
+    
+    # Analisa cada arquivo encontrado
+    for filename, year, tipo in arquivos_encontrados:
+        inspect_csv(filename, year)
     
     print(f"\n{'='*80}")
     print("✅ Inspeção concluída!")
-    print("\n💡 Dicas:")
-    print("   1. Use os nomes EXATOS das colunas no código da API")
-    print("   2. Colunas com 'CO_' geralmente são códigos")
-    print("   3. Colunas com 'NO_' ou 'NM_' geralmente são nomes")
-    print("   4. Colunas com 'NU_' geralmente são valores numéricos")
-    print("   5. Procure por colunas de UF/Estado/Município para análise regional")
+    print("\n💡 Informações Importantes:")
+    print("   1. Use os nomes EXATOS das colunas na API")
+    print("   2. Colunas NU_NOTA_* contêm as notas das provas")
+    print("   3. TP_PRESENCA_* indica presença (1) ou falta (0)")
+    print("   4. TP_ESCOLA: 1=Pública, 2=Privada")
+    print("   5. SG_UF_RESIDENCIA contém a sigla do estado")
+    print("   6. Considere usar amostragem para testes (arquivos são grandes)")
+    print("\n📊 Próximos passos:")
+    print("   1. Configure a API com estas colunas")
+    print("   2. Teste localmente antes de subir para Hugging Face")
+    print("   3. Para Hugging Face, prepare os datasets por ano")
     print(f"{'='*80}\n")
 
 if __name__ == "__main__":
