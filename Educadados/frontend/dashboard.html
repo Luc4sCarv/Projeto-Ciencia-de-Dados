@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EducaDados - Dashboard do Usuário</title>
+    <title>EducaDados - Dashboard ENEM 2022-2024</title>
     <link rel="stylesheet" href="styles/dashboard.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <header class="header">
-        <h1 class="logo">EducaDados</h1>
+        <h1 class="logo">📊 EducaDados ENEM</h1>
         <div class="header-right">
             <span class="status-badge" id="connectionStatus">Conectando...</span>
             <button class="btn-logout" onclick="logout()">Sair</button>
@@ -20,16 +20,12 @@
     <div class="dashboard">
         <aside class="sidebar">
             <div class="filter-group">
-                <h3>Fonte de Dados:</h3>
-                <select id="datasetSelector" class="filter-input">
-                    <option value="censo">Censo Escolar 2024</option>
-                    <option value="enem">ENEM 2024</option>
+                <h3>Ano do ENEM:</h3>
+                <select id="yearSelector" class="filter-input">
+                    <option value="2022">ENEM 2022</option>
+                    <option value="2023" selected>ENEM 2023</option>
+                    <option value="2024">ENEM 2024</option>
                 </select>
-            </div>
-
-            <div class="filter-group">
-                <h3>Filtros:</h3>
-                <input type="text" class="filter-input" id="searchInput" placeholder="Pesquisar...">
             </div>
 
             <div class="filter-group">
@@ -41,17 +37,34 @@
                     </label>
                     <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
                         <input type="radio" name="view" value="statistics" style="margin-right: 0.5rem;">
-                        Estatísticas
+                        Estatísticas Detalhadas
                     </label>
                     <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
                         <input type="radio" name="view" value="regional" style="margin-right: 0.5rem;">
                         Análise Regional
                     </label>
                     <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
+                        <input type="radio" name="view" value="comparison" style="margin-right: 0.5rem;">
+                        Comparar Anos
+                    </label>
+                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
                         <input type="radio" name="view" value="charts" style="margin-right: 0.5rem;">
-                        Gráficos
+                        Gráficos por Área
                     </label>
                 </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Análises Especiais:</h3>
+                <button onclick="loadSchoolComparison()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
+                    🏫 Pública vs Privada
+                </button>
+                <button onclick="loadPresenceAnalysis()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
+                    ✅ Taxa de Presença
+                </button>
+                <button onclick="loadInsights()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
+                    💡 Insights
+                </button>
             </div>
 
             <div class="filter-group">
@@ -62,9 +75,9 @@
         </aside>
 
         <main class="main-content">
-            <!-- Seção de Dados Essenciais -->
+            <!-- Seção de Cards Essenciais -->
             <section class="section">
-                <h2 class="section-title">Dados Essenciais</h2>
+                <h2 class="section-title" id="mainTitle">Dados Essenciais - ENEM 2023</h2>
                 <div class="cards-grid" id="essentialCards">
                     <div class="info-card loading">
                         <h4>Carregando...</h4>
@@ -73,32 +86,68 @@
                 </div>
             </section>
 
-            <!-- Seção de Gráficos -->
-            <section class="section" id="chartsSection" style="display: none;">
-                <h2 class="section-title">Visualizações</h2>
+            <!-- Seção de Gráfico Principal -->
+            <section class="section" id="mainChartSection">
+                <h2 class="section-title">Médias por Área de Conhecimento</h2>
                 <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <canvas id="mainChart" width="400" height="200"></canvas>
                 </div>
             </section>
 
             <!-- Seção de Dados Detalhados -->
-            <section class="section">
+            <section class="section" id="detailsSection" style="display: none;">
                 <h2 class="section-title">Dados Detalhados</h2>
-                <div id="detailedData" style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow-x: auto;">
+                <div id="detailedData" class="data-container">
                     <p style="color: #666;">Carregando dados...</p>
                 </div>
             </section>
 
             <!-- Seção de Análise Regional -->
             <section class="section" id="regionalSection" style="display: none;">
-                <h2 class="section-title">Análise Regional</h2>
+                <h2 class="section-title">Análise Regional - Top 10 Estados</h2>
                 <div id="regionalData" class="tools-grid">
                     <!-- Dados regionais serão carregados aqui -->
+                </div>
+            </section>
+
+            <!-- Seção de Comparação entre Anos -->
+            <section class="section" id="comparisonSection" style="display: none;">
+                <h2 class="section-title">Evolução 2022-2024</h2>
+                <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                    <canvas id="comparisonChart" width="400" height="200"></canvas>
+                </div>
+                <div id="comparisonGrid" class="tools-grid">
+                    <!-- Cards de comparação -->
+                </div>
+            </section>
+
+            <!-- Seção de Análise Escolar -->
+            <section class="section" id="schoolSection" style="display: none;">
+                <h2 class="section-title">Comparativo: Escola Pública vs Privada</h2>
+                <div id="schoolData" class="tools-grid">
+                    <!-- Dados escolares -->
+                </div>
+            </section>
+
+            <!-- Seção de Presença -->
+            <section class="section" id="presenceSection" style="display: none;">
+                <h2 class="section-title">Taxa de Presença por Prova</h2>
+                <div id="presenceData" class="data-container">
+                    <!-- Dados de presença -->
+                </div>
+            </section>
+
+            <!-- Seção de Insights -->
+            <section class="section" id="insightsSection" style="display: none;">
+                <h2 class="section-title">💡 Insights para Preparação</h2>
+                <div id="insightsData" class="insights-container">
+                    <!-- Insights -->
                 </div>
             </section>
         </main>
     </div>
 
+    <!-- Formas Decorativas -->
     <div class="decorative-shapes">
         <div class="shape circle"></div>
         <div class="shape triangle"></div>
@@ -106,284 +155,7 @@
         <div class="shape blob"></div>
     </div>
 
-    <script>
-        // Configuração da API
-        const API_URL = 'http://localhost:8000';
-        
-        let currentDataset = 'censo';
-        let currentView = 'overview';
-        let chartInstance = null;
-
-        // Função para verificar conexão
-        async function checkConnection() {
-            try {
-                const response = await fetch(`${API_URL}/health`);
-                const data = await response.json();
-                
-                document.getElementById('connectionStatus').textContent = '✓ Conectado';
-                document.getElementById('connectionStatus').style.background = '#4caf50';
-                
-                return true;
-            } catch (error) {
-                document.getElementById('connectionStatus').textContent = '✗ API Offline';
-                document.getElementById('connectionStatus').style.background = '#f44336';
-                return false;
-            }
-        }
-
-        // Função para carregar dados essenciais
-        async function loadEssentialData() {
-            const cardsContainer = document.getElementById('essentialCards');
-            cardsContainer.innerHTML = '<div class="info-card loading"><h4>Carregando...</h4></div>';
-
-            try {
-                const endpoint = currentDataset === 'censo' ? '/api/censo/overview' : '/api/enem/overview';
-                const response = await fetch(`${API_URL}${endpoint}`);
-                const data = await response.json();
-
-                let cards = '';
-
-                if (currentDataset === 'censo') {
-                    cards = `
-                        <div class="info-card">
-                            <h4>Total de Escolas</h4>
-                            <div class="value">${data.total_escolas || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Total de Colunas</h4>
-                            <div class="value">${data.total_colunas || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Registros Carregados</h4>
-                            <div class="value">${data.total_escolas || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Status</h4>
-                            <div class="value">✓</div>
-                        </div>
-                    `;
-                } else {
-                    cards = `
-                        <div class="info-card">
-                            <h4>Participantes</h4>
-                            <div class="value">${data.participantes?.total || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Resultados</h4>
-                            <div class="value">${data.resultados?.total || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Itens de Prova</h4>
-                            <div class="value">${data.itens_prova?.total || 0}</div>
-                        </div>
-                        <div class="info-card">
-                            <h4>Status</h4>
-                            <div class="value">✓</div>
-                        </div>
-                    `;
-                }
-
-                cardsContainer.innerHTML = cards;
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                cardsContainer.innerHTML = `
-                    <div class="info-card" style="grid-column: 1/-1; background: #ffebee; border-left: 4px solid #f44336;">
-                        <h4>⚠️ Erro ao Carregar Dados</h4>
-                        <p style="font-size: 0.9rem; margin-top: 0.5rem;">Verifique se a API está rodando em ${API_URL}</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Função para carregar estatísticas
-        async function loadStatistics() {
-            const detailedData = document.getElementById('detailedData');
-            detailedData.innerHTML = '<p>Carregando estatísticas...</p>';
-
-            try {
-                const endpoint = currentDataset === 'censo' ? '/api/censo/estatisticas' : '/api/enem/estatisticas';
-                const response = await fetch(`${API_URL}${endpoint}`);
-                const data = await response.json();
-
-                let html = '<h3>Estatísticas do Dataset</h3>';
-                html += `<p><strong>Total de Registros:</strong> ${data.total_registros || 0}</p>`;
-                
-                if (data.medias) {
-                    html += '<h4>Médias:</h4><ul>';
-                    for (let [key, value] of Object.entries(data.medias)) {
-                        html += `<li><strong>${key}:</strong> ${value.toFixed(2)}</li>`;
-                    }
-                    html += '</ul>';
-                }
-
-                if (data.colunas) {
-                    html += `<h4>Colunas Disponíveis (${data.colunas.length}):</h4>`;
-                    html += `<p style="font-size: 0.9rem; color: #666;">${data.colunas.slice(0, 20).join(', ')}...</p>`;
-                }
-
-                detailedData.innerHTML = html;
-            } catch (error) {
-                console.error('Erro:', error);
-                detailedData.innerHTML = '<p style="color: #f44336;">Erro ao carregar estatísticas</p>';
-            }
-        }
-
-        // Função para carregar análise regional
-        async function loadRegionalData() {
-            const regionalData = document.getElementById('regionalData');
-            regionalData.innerHTML = '<p>Carregando dados regionais...</p>';
-
-            try {
-                const endpoint = currentDataset === 'censo' ? '/api/censo/por-regiao' : '/api/enem/por-estado';
-                const response = await fetch(`${API_URL}${endpoint}`);
-                const data = await response.json();
-
-                let html = '';
-                for (let [key, values] of Object.entries(data)) {
-                    if (typeof values === 'object') {
-                        html += `<div class="tool-card">
-                            <h4>${key}</h4>
-                            <ul style="font-size: 0.9rem;">`;
-                        
-                        let count = 0;
-                        for (let [region, value] of Object.entries(values)) {
-                            if (count < 5) {
-                                html += `<li>${region}: ${value}</li>`;
-                                count++;
-                            }
-                        }
-                        html += '</ul></div>';
-                    }
-                }
-
-                regionalData.innerHTML = html || '<p>Nenhum dado regional encontrado</p>';
-            } catch (error) {
-                console.error('Erro:', error);
-                regionalData.innerHTML = '<p style="color: #f44336;">Erro ao carregar dados regionais</p>';
-            }
-        }
-
-        // Função para criar gráficos
-        async function loadCharts() {
-            const canvas = document.getElementById('mainChart');
-            const ctx = canvas.getContext('2d');
-
-            try {
-                const endpoint = currentDataset === 'enem' ? '/api/enem/areas-conhecimento' : '/api/censo/estatisticas';
-                const response = await fetch(`${API_URL}${endpoint}`);
-                const data = await response.json();
-
-                // Destrói gráfico anterior se existir
-                if (chartInstance) {
-                    chartInstance.destroy();
-                }
-
-                let labels = [];
-                let values = [];
-
-                if (currentDataset === 'enem' && data.areas) {
-                    labels = Object.keys(data.areas);
-                    values = Object.values(data.areas);
-                } else if (data.medias) {
-                    labels = Object.keys(data.medias).slice(0, 10);
-                    values = Object.values(data.medias).slice(0, 10);
-                }
-
-                chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Valores',
-                            data: values,
-                            backgroundColor: 'rgba(76, 175, 80, 0.5)',
-                            borderColor: 'rgba(76, 175, 80, 1)',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            },
-                            title: {
-                                display: true,
-                                text: currentDataset === 'enem' ? 'Médias por Área de Conhecimento' : 'Estatísticas Gerais'
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } catch (error) {
-                console.error('Erro ao criar gráfico:', error);
-            }
-        }
-
-        // Função para atualizar visualização
-        function updateView() {
-            const view = document.querySelector('input[name="view"]:checked').value;
-            currentView = view;
-
-            // Esconde todas as seções especiais
-            document.getElementById('chartsSection').style.display = 'none';
-            document.getElementById('regionalSection').style.display = 'none';
-
-            switch(view) {
-                case 'overview':
-                    loadEssentialData();
-                    break;
-                case 'statistics':
-                    loadStatistics();
-                    break;
-                case 'regional':
-                    document.getElementById('regionalSection').style.display = 'block';
-                    loadRegionalData();
-                    break;
-                case 'charts':
-                    document.getElementById('chartsSection').style.display = 'block';
-                    loadCharts();
-                    break;
-            }
-        }
-
-        // Função para recarregar dados
-        function reloadData() {
-            checkConnection();
-            updateView();
-        }
-
-        // Event Listeners
-        document.getElementById('datasetSelector').addEventListener('change', (e) => {
-            currentDataset = e.target.value;
-            reloadData();
-        });
-
-        document.querySelectorAll('input[name="view"]').forEach(radio => {
-            radio.addEventListener('change', updateView);
-        });
-
-        // Função logout
-        function logout() {
-            if(confirm('Deseja realmente sair?')) {
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Inicialização
-        window.addEventListener('load', async () => {
-            await checkConnection();
-            await loadEssentialData();
-            
-            // Verifica conexão a cada 30 segundos
-            setInterval(checkConnection, 30000);
-        });
-    </script>
+    <!-- Script JavaScript -->
+    <script src="scripts/dashboard.js"></script>
 </body>
 </html>
