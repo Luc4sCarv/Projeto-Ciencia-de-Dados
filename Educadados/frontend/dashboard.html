@@ -1,161 +1,148 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EducaDados - Dashboard ENEM 2022-2024</title>
-    <link rel="stylesheet" href="styles/dashboard.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EducaDados - Dashboard ENEM 2022-2024</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles/dashboard.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
-    <header class="header">
-        <h1 class="logo">📊 EducaDados ENEM</h1>
-        <div class="header-right">
-            <span class="status-badge" id="connectionStatus">Conectando...</span>
-            <button class="btn-logout" onclick="logout()">Sair</button>
-            <div class="user-icon">👤</div>
+  <!-- HEADER -->
+  <header class="header" style="display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; background:#ffffff; box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+    <div style="display:flex; align-items:center; gap:1rem;">
+      <h1 class="logo" style="margin:0; font-size:1.25rem;">📊 EducaDados ENEM</h1>
+    </div>
+
+    <div class="header-right" style="display:flex; align-items:center; gap:0.75rem;">
+      <span class="status-badge" id="connectionStatus" style="padding:6px 10px; border-radius:999px; background:#f0f0f0;">Conectando...</span>
+      <button class="btn-logout" onclick="logout()" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:6px; cursor:pointer;">Sair</button>
+      <div class="user-icon" style="font-size:1.1rem;">👤</div>
+    </div>
+  </header>
+
+  <!-- LAYOUT PRINCIPAL -->
+  <div class="dashboard" style="display:flex; gap:2rem; padding:2rem; max-width:1300px; margin:1.5rem auto;">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" style="width:260px;">
+      <div class="filter-group" style="background:white; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:1rem;">
+        <h3 style="margin:0 0 0.5rem 0;">Ano do ENEM:</h3>
+        <select id="yearSelector" class="filter-input" style="width:100%; padding:0.5rem; border-radius:6px; border:1px solid #e5e7eb;">
+          <option value="2022">ENEM 2022</option>
+          <option value="2023" selected>ENEM 2023</option>
+          <option value="2024">ENEM 2024</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="background:white; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:1rem;">
+        <h3 style="margin:0 0 0.5rem 0;">Visualizações</h3>
+        <div style="padding: 0 0.25rem;">
+          <label style="display:block; margin:0.5rem 0; cursor:pointer;">
+            <input type="radio" name="view" value="overview" checked style="margin-right:.5rem;"> Visão Geral
+          </label>
+          <label style="display:block; margin:0.5rem 0; cursor:pointer;">
+            <input type="radio" name="view" value="statistics" style="margin-right:.5rem;"> Estatísticas Detalhadas
+          </label>
+          <label style="display:block; margin:0.5rem 0; cursor:pointer;">
+            <input type="radio" name="view" value="regional" style="margin-right:.5rem;"> Análise Regional
+          </label>
+          <label style="display:block; margin:0.5rem 0; cursor:pointer;">
+            <input type="radio" name="view" value="comparison" style="margin-right:.5rem;"> Comparar Anos
+          </label>
+          <label style="display:block; margin:0.5rem 0; cursor:pointer;">
+            <input type="radio" name="view" value="charts" style="margin-right:.5rem;"> Gráficos por Área
+          </label>
         </div>
-    </header>
+      </div>
 
-    <div class="dashboard">
-        <aside class="sidebar">
-            <div class="filter-group">
-                <h3>Ano do ENEM:</h3>
-                <select id="yearSelector" class="filter-input">
-                    <option value="2022">ENEM 2022</option>
-                    <option value="2023" selected>ENEM 2023</option>
-                    <option value="2024">ENEM 2024</option>
-                </select>
-            </div>
+      <div class="filter-group" style="background:white; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:1rem;">
+        <h3 style="margin:0 0 0.5rem 0;">Análises Especiais:</h3>
+        <button onclick="loadSchoolComparison()" class="control-btn" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; border-radius:6px; border:none; background:#10b981; color:white; cursor:pointer;">🏫 Pública vs Privada</button>
+        <button onclick="loadPresenceAnalysis()" class="control-btn" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; border-radius:6px; border:none; background:#3b82f6; color:white; cursor:pointer;">✅ Taxa de Presença</button>
+        <button onclick="loadInsights()" class="control-btn" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; border-radius:6px; border:none; background:#8b5cf6; color:white; cursor:pointer;">💡 Insights</button>
+      </div>
 
-            <div class="filter-group">
-                <h3>Visualizações</h3>
-                <div style="padding: 0 1.5rem;">
-                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
-                        <input type="radio" name="view" value="overview" checked style="margin-right: 0.5rem;">
-                        Visão Geral
-                    </label>
-                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
-                        <input type="radio" name="view" value="statistics" style="margin-right: 0.5rem;">
-                        Estatísticas Detalhadas
-                    </label>
-                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
-                        <input type="radio" name="view" value="regional" style="margin-right: 0.5rem;">
-                        Análise Regional
-                    </label>
-                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
-                        <input type="radio" name="view" value="comparison" style="margin-right: 0.5rem;">
-                        Comparar Anos
-                    </label>
-                    <label style="display: block; margin: 0.5rem 0; cursor: pointer;">
-                        <input type="radio" name="view" value="charts" style="margin-right: 0.5rem;">
-                        Gráficos por Área
-                    </label>
-                </div>
-            </div>
+      <div class="filter-group" style="background:white; padding:1rem; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+        <button onclick="reloadData()" class="control-btn" style="width:100%; padding:0.6rem; border-radius:6px; border:none; background:#f59e0b; color:white; cursor:pointer;">🔄 Atualizar Dados</button>
+      </div>
+    </aside>
 
-            <div class="filter-group">
-                <h3>Análises Especiais:</h3>
-                <button onclick="loadSchoolComparison()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
-                    🏫 Pública vs Privada
-                </button>
-                <button onclick="loadPresenceAnalysis()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
-                    ✅ Taxa de Presença
-                </button>
-                <button onclick="loadInsights()" class="control-btn" style="width: 100%; margin-bottom: 0.5rem;">
-                    💡 Insights
-                </button>
-            </div>
+    <!-- MAIN -->
+    <main class="main-content" style="flex:1;">
+      <!-- Mensagem de erro visível para o usuário -->
+      <div id="app-error" style="display:none; background:#fff1f2; color:#b91c1c; padding:12px; border-radius:8px; margin-bottom:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.04);"></div>
 
-            <div class="filter-group">
-                <button onclick="reloadData()" class="control-btn" style="width: 100%; margin-top: 1rem;">
-                    🔄 Atualizar Dados
-                </button>
-            </div>
-        </aside>
+      <!-- Seção de Cards Essenciais -->
+      <section class="section" style="margin-bottom:1.5rem;">
+        <h2 class="section-title" id="mainTitle" style="margin:0 0 1rem 0;">Dados Essenciais - ENEM 2023</h2>
+        <div class="cards-grid" id="essentialCards" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:1rem;">
+          <div class="info-card loading" style="background:white; padding:1rem; border-radius:8px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+            <h4>Carregando...</h4>
+            <div class="value" style="font-size:1.5rem;">⏳</div>
+          </div>
+        </div>
+      </section>
 
-        <main class="main-content">
-            <!-- Seção de Cards Essenciais -->
-            <section class="section">
-                <h2 class="section-title" id="mainTitle">Dados Essenciais - ENEM 2023</h2>
-                <div class="cards-grid" id="essentialCards">
-                    <div class="info-card loading">
-                        <h4>Carregando...</h4>
-                        <div class="value">⏳</div>
-                    </div>
-                </div>
-            </section>
+      <!-- Gráfico Principal -->
+      <section class="section" id="mainChartSection" style="background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">Médias por Área de Conhecimento</h2>
+        <div style="padding:0.5rem 1rem;">
+          <canvas id="mainChart" width="800" height="300"></canvas>
+        </div>
+      </section>
 
-            <!-- Seção de Gráfico Principal -->
-            <section class="section" id="mainChartSection">
-                <h2 class="section-title">Médias por Área de Conhecimento</h2>
-                <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <canvas id="mainChart" width="400" height="200"></canvas>
-                </div>
-            </section>
+      <!-- Dados Detalhados -->
+      <section class="section" id="detailsSection" style="display:none; background:white; padding:1.5rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:1.5rem;">
+        <h2 class="section-title">Dados Detalhados</h2>
+        <div id="detailedData" class="data-container" style="margin-top:1rem; padding:0.5rem;">Carregando dados...</div>
+      </section>
 
-            <!-- Seção de Dados Detalhados -->
-            <section class="section" id="detailsSection" style="display: none;">
-                <h2 class="section-title">Dados Detalhados</h2>
-                <div id="detailedData" class="data-container">
-                    <p style="color: #666;">Carregando dados...</p>
-                </div>
-            </section>
+      <!-- Regional -->
+      <section class="section" id="regionalSection" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">Análise Regional - Top 10 Estados</h2>
+        <div id="regionalData" class="tools-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem;"></div>
+      </section>
 
-            <!-- Seção de Análise Regional -->
-            <section class="section" id="regionalSection" style="display: none;">
-                <h2 class="section-title">Análise Regional - Top 10 Estados</h2>
-                <div id="regionalData" class="tools-grid">
-                    <!-- Dados regionais serão carregados aqui -->
-                </div>
-            </section>
+      <!-- Comparação -->
+      <section class="section" id="comparisonSection" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">Evolução 2022-2024</h2>
+        <div style="background:white; padding:1rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06); margin-bottom:1rem;">
+          <canvas id="comparisonChart" width="800" height="260"></canvas>
+        </div>
+        <div id="comparisonGrid" class="tools-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem;"></div>
+      </section>
 
-            <!-- Seção de Comparação entre Anos -->
-            <section class="section" id="comparisonSection" style="display: none;">
-                <h2 class="section-title">Evolução 2022-2024</h2>
-                <div style="background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-                    <canvas id="comparisonChart" width="400" height="200"></canvas>
-                </div>
-                <div id="comparisonGrid" class="tools-grid">
-                    <!-- Cards de comparação -->
-                </div>
-            </section>
+      <!-- School Section -->
+      <section class="section" id="schoolSection" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">Comparativo: Escola Pública vs Privada</h2>
+        <div id="schoolData" class="tools-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:1rem;"></div>
+      </section>
 
-            <!-- Seção de Análise Escolar -->
-            <section class="section" id="schoolSection" style="display: none;">
-                <h2 class="section-title">Comparativo: Escola Pública vs Privada</h2>
-                <div id="schoolData" class="tools-grid">
-                    <!-- Dados escolares -->
-                </div>
-            </section>
+      <!-- Presence -->
+      <section class="section" id="presenceSection" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">Taxa de Presença por Prova</h2>
+        <div id="presenceData" class="data-container" style="background:white; padding:1rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06);"></div>
+      </section>
 
-            <!-- Seção de Presença -->
-            <section class="section" id="presenceSection" style="display: none;">
-                <h2 class="section-title">Taxa de Presença por Prova</h2>
-                <div id="presenceData" class="data-container">
-                    <!-- Dados de presença -->
-                </div>
-            </section>
+      <!-- Insights -->
+      <section class="section" id="insightsSection" style="display:none; margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 1rem 0;">💡 Insights para Preparação</h2>
+        <div id="insightsData" class="insights-container" style="background:white; padding:1rem; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.06);"></div>
+      </section>
+    </main>
+  </div>
 
-            <!-- Seção de Insights -->
-            <section class="section" id="insightsSection" style="display: none;">
-                <h2 class="section-title">💡 Insights para Preparação</h2>
-                <div id="insightsData" class="insights-container">
-                    <!-- Insights -->
-                </div>
-            </section>
-        </main>
-    </div>
+  <!-- Footer / decorative shapes (opcional) -->
+  <div style="max-width:1300px; margin:0 auto; padding:1rem; color:#94a3b8; font-size:0.9rem;">
+    <small>EducaDados — Painel de visualização dos resultados do ENEM (2022–2024)</small>
+  </div>
 
-    <!-- Formas Decorativas -->
-    <div class="decorative-shapes">
-        <div class="shape circle"></div>
-        <div class="shape triangle"></div>
-        <div class="shape star"></div>
-        <div class="shape blob"></div>
-    </div>
-
-    <!-- Script JavaScript -->
-    <script src="scripts/dashboard.js"></script>
+  <!-- SCRIPTS (no final do body) -->
+  <!-- Carregue primeiro bibliotecas (já carregado no head), depois seu script -->
+  <script src="scripts/dashboard.js"></script>
 </body>
 </html>
